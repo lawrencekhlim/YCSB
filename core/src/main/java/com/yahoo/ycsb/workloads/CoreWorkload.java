@@ -340,6 +340,12 @@ public class CoreWorkload extends Workload {
    * Default value of the field name prefix.
    */
   public static final String FIELD_NAME_PREFIX_DEFAULT = "field";
+  
+  /**
+   * Value for Zipfian constant
+   */
+  public static final String ZIPFIAN_CONSTANT = "zipfconstant";
+  public static final String ZIPFIAN_CONSTANT_DEFAULT = "0.99";
 
   protected NumberGenerator keysequence;
   protected DiscreteGenerator operationchooser;
@@ -482,8 +488,13 @@ public class CoreWorkload extends Workload {
           p.getProperty(INSERT_PROPORTION_PROPERTY, INSERT_PROPORTION_PROPERTY_DEFAULT));
       int opcount = Integer.parseInt(p.getProperty(Client.OPERATION_COUNT_PROPERTY));
       int expectednewkeys = (int) ((opcount) * insertproportion * 2.0); // 2 is fudge factor
-
-      keychooser = new ScrambledZipfianGenerator(insertstart, insertstart + insertcount + expectednewkeys);
+      
+      // CHANGES HERE --------------
+      double zipfconstant = Double.parseDouble(
+              p.getProperty(ZIPFIAN_CONSTANT, ZIPFIAN_CONSTANT_DEFAULT));
+      System.out.println("zipfconstant = " + zipfconstant);
+      // CHANGES HERE --------------
+      keychooser = new ZipfianGenerator(insertstart, insertstart + insertcount + expectednewkeys, zipfconstant);
     } else if (requestdistrib.compareTo("latest") == 0) {
       keychooser = new SkewedLatestGenerator(transactioninsertkeysequence);
     } else if (requestdistrib.equals("hotspot")) {
